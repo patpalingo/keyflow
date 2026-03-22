@@ -9,7 +9,7 @@ export function evaluateHit(
   inputNote: number,
   inputTime: number,
   gameNotes: GameNote[],
-  currentTime: number,
+  _currentTime: number,
 ): { note: GameNote; result: HitResult } | null {
   let bestMatch: GameNote | null = null;
   let bestDelta = Infinity;

@@ -29,31 +29,6 @@ function buildSong(
   };
 }
 
-// Helper: place notes sequentially with a gap
-function seq(
-  midis: number[],
-  startTime: number,
-  dur: number,
-  gap: number,
-  hand: 'left' | 'right',
-): { midi: number; start: number; dur: number; hand: 'left' | 'right' }[] {
-  return midis.map((midi, i) => ({
-    midi,
-    start: startTime + i * gap,
-    dur,
-    hand,
-  }));
-}
-
-// Helper: chord at a time
-function chord(
-  midis: number[],
-  start: number,
-  dur: number,
-  hand: 'left' | 'right',
-): { midi: number; start: number; dur: number; hand: 'left' | 'right' }[] {
-  return midis.map(midi => ({ midi, start, dur, hand }));
-}
 
 export function createTwinkleTwinkle(): ParsedSong {
   // Twinkle Twinkle Little Star in C major

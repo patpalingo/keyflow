@@ -33,7 +33,7 @@ export function useMidiConnection() {
     });
 
     // Wire up MIDI note callbacks to game store
-    onNoteOn((note, velocity, timestamp) => {
+    onNoteOn((note, _velocity, _timestamp) => {
       const gameState = useGameStore.getState();
       gameState.addActiveNote(note);
 
