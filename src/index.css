@@ -1,0 +1,143 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --kf-bg: #faf7f2;
+  --kf-surface: #ffffff;
+  --kf-surface-2: #f0edfa;
+  --kf-border: #e8e2f0;
+  --kf-border-hover: #d4cce2;
+  --kf-text: #4a4458;
+  --kf-text-dim: #9490a3;
+  --kf-text-bright: #2d2843;
+  --kf-accent: #7c6bc4;
+  --kf-accent-glow: rgba(124, 107, 196, 0.12);
+  --kf-accent-soft: #a99be0;
+  --kf-lavender: #b4a7e0;
+  --kf-rose: #f2889b;
+  --kf-mint: #5ec4a8;
+  --kf-coral: #f4845f;
+  --kf-sky: #6bb8e0;
+  --kf-peach: #fbbf8e;
+  --kf-pink: #f0a0c0;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--kf-bg);
+  color: var(--kf-text);
+  font-family: 'Nunito', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--kf-border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--kf-border-hover);
+}
+
+/* Font classes */
+.font-display {
+  font-family: 'Quicksand', 'Nunito', sans-serif;
+}
+.font-mono {
+  font-family: 'Space Mono', ui-monospace, monospace;
+}
+
+/* Custom range slider */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 6px;
+  background: var(--kf-border);
+  border-radius: 3px;
+  outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--kf-accent);
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(124, 107, 196, 0.3);
+  transition: transform 0.15s ease;
+}
+input[type="range"]::-webkit-slider-thumb:hover {
+  transform: scale(1.15);
+}
+
+/* Playful card hover */
+.playful-card {
+  position: relative;
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.playful-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(124, 107, 196, 0.12), 0 2px 8px rgba(0,0,0,0.04);
+}
+.playful-card:active {
+  transform: translateY(0px) scale(0.98);
+}
+
+/* Animate in */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-up {
+  animation: fadeUp 0.5s ease-out both;
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+.animate-scale-in {
+  animation: scaleIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes bounceIn {
+  0% { transform: scale(0.3); opacity: 0; }
+  50% { transform: scale(1.05); }
+  70% { transform: scale(0.95); }
+  100% { transform: scale(1); opacity: 1; }
+}
+.animate-bounce-in {
+  animation: bounceIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-3deg); }
+  75% { transform: rotate(3deg); }
+}
