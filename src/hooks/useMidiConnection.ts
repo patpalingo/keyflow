@@ -42,6 +42,9 @@ export function useMidiConnection() {
         if (hit) {
           gameState.recordHit(hit.result);
           addHitEffect(note, hit.result);
+        } else if (gameState.learningMode) {
+          // Wrong note feedback in learning mode
+          gameState.addWrongNote(note);
         }
       }
     });

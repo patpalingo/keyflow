@@ -20,6 +20,9 @@ export interface GameState {
   hitCounts: { perfect: number; good: number; miss: number };
   activeInputNotes: Set<number>;
   countdownValue: number;
+  learningMode: boolean;
+  waitMode: boolean;
+  wrongNotes: Map<number, number>;
 }
 
 export interface UserProfile {

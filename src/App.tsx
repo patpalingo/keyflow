@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import { useMidiConnection } from './hooks/useMidiConnection';
 import { useSongStore } from './stores/songStore';
+import { useGameStore } from './stores/gameStore';
 import { MidiStatus } from './components/MidiStatus';
 import { DevicePicker } from './components/DevicePicker';
 import { SongSelect } from './components/SongSelect';
 import { GameView } from './components/GameView';
+import { SpeedSelector } from './components/SpeedSelector';
 import { DEMO_SONGS } from './utils/demoSong';
+import { setPlaybackSpeed as setAudioSpeed } from './services/audioPlayback';
 
 type View = 'home' | 'game';
 
@@ -18,7 +21,18 @@ const difficultyColors: Record<string, { bg: string; text: string; emoji: string
 function App() {
   const [view, setView] = useState<View>('home');
   const song = useSongStore((s) => s.song);
+  const playbackSpeed = useGameStore((s) => s.playbackSpeed);
+  const learningMode = useGameStore((s) => s.learningMode);
+  const waitMode = useGameStore((s) => s.waitMode);
+  const setSpeed = useGameStore((s) => s.setPlaybackSpeed);
+  const setLearningMode = useGameStore((s) => s.setLearningMode);
+  const setWaitMode = useGameStore((s) => s.setWaitMode);
   useMidiConnection();
+
+  const handleSpeedChange = (speed: number) => {
+    setSpeed(speed);
+    setAudioSpeed(speed);
+  };
 
   const handleQuickPlay = (id: string) => {
     const entry = DEMO_SONGS.find(s => s.id === id);
@@ -116,6 +130,69 @@ function App() {
         <section className="animate-fade-up" style={{ animationDelay: '0.25s' }}>
           <SectionHeading emoji="📂">Load Your Own</SectionHeading>
           <SongSelect />
+        </section>
+
+        {/* Settings */}
+        <section className="animate-fade-up" style={{ animationDelay: '0.2s' }}>
+          <SectionHeading emoji="⚙️">Settings</SectionHeading>
+          <div
+            className="rounded-2xl p-5 space-y-5"
+            style={{
+              background: 'var(--kf-surface)',
+              boxShadow: '0 2px 12px rgba(0,0,0,0.04), 0 1px 3px rgba(0,0,0,0.03)',
+            }}
+          >
+            {/* Speed */}
+            <div>
+              <SpeedSelector value={playbackSpeed} onChange={handleSpeedChange} variant="light" />
+            </div>
+
+            {/* Learning Mode */}
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="font-display font-bold text-sm" style={{ color: 'var(--kf-text-bright)' }}>
+                  Learning Mode
+                </div>
+                <div className="text-xs mt-0.5" style={{ color: 'var(--kf-text-dim)' }}>
+                  Note names, hand labels on falling notes
+                </div>
+              </div>
+              <button
+                onClick={() => setLearningMode(!learningMode)}
+                className="relative w-12 h-7 rounded-full transition-colors duration-200"
+                style={{ background: learningMode ? 'var(--kf-accent)' : '#d4cce2' }}
+              >
+                <div
+                  className="absolute top-1 w-5 h-5 rounded-full bg-white shadow transition-transform duration-200"
+                  style={{ transform: learningMode ? 'translateX(22px)' : 'translateX(4px)' }}
+                />
+              </button>
+            </div>
+
+            {/* Wait Mode (only when learning mode is on) */}
+            {learningMode && (
+              <div className="flex items-center justify-between pl-4 border-l-2" style={{ borderColor: 'var(--kf-accent)' }}>
+                <div>
+                  <div className="font-display font-bold text-sm" style={{ color: 'var(--kf-text-bright)' }}>
+                    Wait Mode
+                  </div>
+                  <div className="text-xs mt-0.5" style={{ color: 'var(--kf-text-dim)' }}>
+                    Pauses until you play the right note
+                  </div>
+                </div>
+                <button
+                  onClick={() => setWaitMode(!waitMode)}
+                  className="relative w-12 h-7 rounded-full transition-colors duration-200"
+                  style={{ background: waitMode ? 'var(--kf-mint)' : '#d4cce2' }}
+                >
+                  <div
+                    className="absolute top-1 w-5 h-5 rounded-full bg-white shadow transition-transform duration-200"
+                    style={{ transform: waitMode ? 'translateX(22px)' : 'translateX(4px)' }}
+                  />
+                </button>
+              </div>
+            )}
+          </div>
         </section>
 
         {/* Play button for loaded MIDI files */}

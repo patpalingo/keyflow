@@ -1,6 +1,8 @@
-import { KEYBOARD_LAYOUT, PIANO_MIN, PIANO_MAX } from '../utils/noteMapping';
+import { KEYBOARD_LAYOUT, PIANO_MIN, PIANO_MAX, midiToNoteName } from '../utils/noteMapping';
 import { COLORS } from '../utils/colorScheme';
 import { KEYBOARD_HEIGHT_RATIO } from './constants';
+
+const WRONG_NOTE_DURATION = 300; // ms
 
 export function drawKeyboard(
   ctx: CanvasRenderingContext2D,
@@ -8,6 +10,8 @@ export function drawKeyboard(
   canvasHeight: number,
   activeInputNotes: Set<number>,
   expectedNotes: Set<number>,
+  learningMode: boolean = false,
+  wrongNotes: Map<number, number> = new Map(),
 ) {
   const kbHeight = canvasHeight * KEYBOARD_HEIGHT_RATIO;
   const kbTop = canvasHeight - kbHeight;
@@ -20,14 +24,20 @@ export function drawKeyboard(
   const whiteKeys = KEYBOARD_LAYOUT.filter(k => !k.isBlack);
   const blackKeys = KEYBOARD_LAYOUT.filter(k => k.isBlack);
 
+  const now = performance.now();
+
   for (const key of whiteKeys) {
     const x = key.x * canvasWidth;
     const w = key.width * canvasWidth;
 
     const isPressed = activeInputNotes.has(key.midi);
     const isExpected = expectedNotes.has(key.midi);
+    const wrongTime = wrongNotes.get(key.midi);
+    const isWrong = wrongTime !== undefined && (now - wrongTime) < WRONG_NOTE_DURATION;
 
-    if (isPressed) {
+    if (isWrong) {
+      ctx.fillStyle = '#f2889b';
+    } else if (isPressed) {
       ctx.fillStyle = COLORS.keyPressed;
     } else if (isExpected) {
       ctx.fillStyle = COLORS.keyExpected;
@@ -52,6 +62,22 @@ export function drawKeyboard(
     ctx.strokeStyle = '#d4cce2';
     ctx.lineWidth = 0.5;
     ctx.stroke();
+
+    // Learning mode: note name labels on expected keys + all C keys
+    if (learningMode) {
+      const isC = key.midi % 12 === 0;
+      if (isExpected || isC) {
+        const name = midiToNoteName(key.midi);
+        const fontSize = Math.min(w * 0.55, 10);
+        ctx.save();
+        ctx.font = `bold ${fontSize}px Quicksand, system-ui`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'bottom';
+        ctx.fillStyle = isExpected ? '#5e4a9e' : '#999';
+        ctx.fillText(name, x + w / 2, kbTop + kbHeight - 3);
+        ctx.restore();
+      }
+    }
   }
 
   for (const key of blackKeys) {
@@ -61,8 +87,12 @@ export function drawKeyboard(
 
     const isPressed = activeInputNotes.has(key.midi);
     const isExpected = expectedNotes.has(key.midi);
+    const wrongTime = wrongNotes.get(key.midi);
+    const isWrong = wrongTime !== undefined && (now - wrongTime) < WRONG_NOTE_DURATION;
 
-    if (isPressed) {
+    if (isWrong) {
+      ctx.fillStyle = '#e05070';
+    } else if (isPressed) {
       ctx.fillStyle = COLORS.keyPressed;
     } else if (isExpected) {
       ctx.fillStyle = '#4a3d6e';
@@ -82,6 +112,19 @@ export function drawKeyboard(
     ctx.quadraticCurveTo(x, kbTop, x + r, kbTop);
     ctx.closePath();
     ctx.fill();
+
+    // Learning mode: labels on expected black keys
+    if (learningMode && isExpected) {
+      const name = midiToNoteName(key.midi).replace(/\d+$/, '');
+      const fontSize = Math.min(w * 0.5, 8);
+      ctx.save();
+      ctx.font = `bold ${fontSize}px Quicksand, system-ui`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'bottom';
+      ctx.fillStyle = '#ddd';
+      ctx.fillText(name, x + w / 2, kbTop + h - 2);
+      ctx.restore();
+    }
   }
 }
 

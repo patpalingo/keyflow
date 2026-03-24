@@ -1,5 +1,6 @@
 import * as Tone from 'tone';
 import type { ParsedSong } from '../types/midi';
+import { LOOK_AHEAD_SECONDS } from '../engine/constants';
 
 let sampler: Tone.Sampler | null = null;
 let scheduledEvents: number[] = [];
@@ -64,7 +65,7 @@ export async function scheduleSong(song: ParsedSong, speed: number): Promise<voi
 
   for (const note of song.allNotes) {
     const midiNote = Tone.Frequency(note.midiNote, 'midi').toNote();
-    const time = note.startTime / speed;
+    const time = (note.startTime + LOOK_AHEAD_SECONDS) / speed;
     const duration = note.duration / speed;
 
     const eventId = Tone.getTransport().schedule((t) => {

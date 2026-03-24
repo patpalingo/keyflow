@@ -2,6 +2,7 @@ import type { GameNote } from '../types/game';
 import { getNoteColor } from '../utils/colorScheme';
 import { getNoteXAndWidth } from './KeyboardRenderer';
 import { HIT_ZONE_Y_RATIO, LOOK_AHEAD_SECONDS, NOTE_BORDER_RADIUS, NOTE_MIN_HEIGHT } from './constants';
+import { midiToNoteName } from '../utils/noteMapping';
 
 export function drawNotes(
   ctx: CanvasRenderingContext2D,
@@ -9,6 +10,7 @@ export function drawNotes(
   canvasHeight: number,
   gameNotes: GameNote[],
   currentTime: number,
+  learningMode: boolean = false,
 ) {
   const hitZoneY = canvasHeight * HIT_ZONE_Y_RATIO;
   const pixelsPerSecond = hitZoneY / LOOK_AHEAD_SECONDS;
@@ -41,6 +43,41 @@ export function drawNotes(
     // Rounded rectangle
     roundRect(ctx, pos.x + 1, drawY, pos.width - 2, noteHeight, NOTE_BORDER_RADIUS);
     ctx.fill();
+
+    // Learning mode: draw note name and hand label
+    if (learningMode) {
+      const noteW = pos.width - 2;
+      const fontSize = Math.min(noteW * 0.65, 13);
+      if (fontSize >= 6) {
+        ctx.save();
+        ctx.globalAlpha = 1;
+        ctx.font = `bold ${fontSize}px Quicksand, Nunito, system-ui`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillStyle = '#fff';
+        ctx.shadowColor = 'rgba(0,0,0,0.4)';
+        ctx.shadowBlur = 2;
+
+        // Note name — show short form for narrow notes
+        const fullName = midiToNoteName(note.midiNote);
+        const label = noteW < 16 ? fullName.replace(/\d+$/, '') : fullName;
+        const centerX = pos.x + 1 + noteW / 2;
+
+        if (noteHeight >= 28) {
+          // Enough room: name centered, hand badge at top
+          ctx.fillText(label, centerX, drawY + noteHeight / 2);
+          if (note.hand !== 'unknown') {
+            ctx.font = `bold ${Math.max(fontSize * 0.7, 7)}px Quicksand, system-ui`;
+            ctx.globalAlpha = 0.7;
+            ctx.fillText(note.hand === 'left' ? 'L' : 'R', centerX, drawY + 8);
+          }
+        } else {
+          // Short note: just the name
+          ctx.fillText(label, centerX, drawY + noteHeight / 2);
+        }
+        ctx.restore();
+      }
+    }
 
     ctx.globalAlpha = 1;
   }

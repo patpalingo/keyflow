@@ -1,5 +1,7 @@
 import { useGameStore } from '../stores/gameStore';
 import { startPlayback, pausePlayback, stopPlayback, setPlaybackSpeed } from '../services/audioPlayback';
+import { LOOK_AHEAD_SECONDS } from '../engine/constants';
+import { SpeedSelector } from './SpeedSelector';
 
 export function GameControls() {
   const status = useGameStore((s) => s.status);
@@ -20,7 +22,7 @@ export function GameControls() {
 
   const handleRestart = () => {
     stopPlayback();
-    setCurrentTime(0);
+    setCurrentTime(-LOOK_AHEAD_SECONDS);
     setStatus('countdown');
   };
 
@@ -56,22 +58,10 @@ export function GameControls() {
       </button>
 
       <div
-        className="flex items-center gap-3 px-5 py-2.5 rounded-full"
-        style={{ background: 'rgba(255,255,255,0.15)', backdropFilter: 'blur(12px)' }}
+        className="px-4 py-2 rounded-full"
+        style={{ background: 'rgba(255,255,255,0.12)', backdropFilter: 'blur(12px)' }}
       >
-        <span className="text-[10px] font-bold uppercase tracking-wide" style={{ color: 'rgba(255,255,255,0.6)' }}>Speed</span>
-        <input
-          type="range"
-          min="0.25"
-          max="1"
-          step="0.05"
-          value={playbackSpeed}
-          onChange={(e) => handleSpeedChange(parseFloat(e.target.value))}
-          className="w-16"
-        />
-        <span className="text-xs font-mono font-bold w-7" style={{ color: '#fbbf8e' }}>
-          {playbackSpeed}x
-        </span>
+        <SpeedSelector value={playbackSpeed} onChange={handleSpeedChange} variant="dark" />
       </div>
     </div>
   );

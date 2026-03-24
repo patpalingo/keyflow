@@ -50,9 +50,12 @@ export class GameRenderer {
     this.ctx.fillStyle = COLORS.background;
     this.ctx.fillRect(0, 0, w, h);
 
+    const learning = state.learningMode;
+    const wrongNotes = state.wrongNotes;
+
     if (state.status === 'finished') {
       // Draw static frame behind the opaque modal, keep loop alive for Play Again
-      drawKeyboard(this.ctx, w, h, new Set(), new Set());
+      drawKeyboard(this.ctx, w, h, new Set(), new Set(), learning, wrongNotes);
       drawHitZone(this.ctx, w, h);
       this.animFrameId = requestAnimationFrame(this.tick);
       return;
@@ -80,14 +83,14 @@ export class GameRenderer {
       }
 
       // Draw layers
-      drawNotes(this.ctx, w, h, state.gameNotes, state.currentTime);
+      drawNotes(this.ctx, w, h, state.gameNotes, state.currentTime, learning);
       drawHitZone(this.ctx, w, h);
       drawEffects(this.ctx, w, h);
-      drawKeyboard(this.ctx, w, h, state.activeInputNotes, expectedNotes);
+      drawKeyboard(this.ctx, w, h, state.activeInputNotes, expectedNotes, learning, wrongNotes);
 
       // Draw countdown if active
     } else if (state.status === 'countdown') {
-      drawKeyboard(this.ctx, w, h, state.activeInputNotes, new Set());
+      drawKeyboard(this.ctx, w, h, state.activeInputNotes, new Set(), learning, wrongNotes);
       drawHitZone(this.ctx, w, h);
 
       // Big countdown number
@@ -107,7 +110,7 @@ export class GameRenderer {
       }
     } else {
       // Idle state — draw keyboard only
-      drawKeyboard(this.ctx, w, h, state.activeInputNotes, new Set());
+      drawKeyboard(this.ctx, w, h, state.activeInputNotes, new Set(), learning, wrongNotes);
     }
 
     this.animFrameId = requestAnimationFrame(this.tick);
