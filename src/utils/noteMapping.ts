@@ -58,7 +58,9 @@ export function buildKeyboardLayout(): KeyLayout[] {
   for (let m = PIANO_MIN; m <= PIANO_MAX; m++) {
     if (isBlackKey(m)) {
       // Black key sits between the previous white key and the next
-      const prevWhiteX = whiteIndex * whiteWidth;
+      // whiteIndex was already incremented by the preceding white key,
+      // so the previous white key is at (whiteIndex - 1)
+      const prevWhiteX = (whiteIndex - 1) * whiteWidth;
       layout.push({
         midi: m,
         x: prevWhiteX + whiteWidth - blackWidth / 2,
